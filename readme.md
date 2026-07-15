@@ -3,6 +3,25 @@ Automatically downloads a youtube video + audio + thumbnail + metadata
 
 Outputs a complete .osz (osu custom map file) ready to start mapping
 
+## Dependencies
+
+Ensure ffmpeg and yt-dlp are available in PATH
+
+## aur
+```
+yay -Sy ffmpeg yt-dlp
+```
+
+## apt
+```
+apt update && apt install ffmpeg yt-dlp -y
+```
+
+### Windows
+```
+winget install Gyan.FFmpeg yt-dlp.yt-dlp --source winget
+```
+
 ## Usage
 
 You can run this program in a few different ways depending on what is most convenient for you.
