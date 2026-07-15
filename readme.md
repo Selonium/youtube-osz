@@ -7,17 +7,17 @@ Outputs a complete .osz (osu custom map file) ready to start mapping
 
 Ensure ffmpeg and yt-dlp are available in PATH
 
-## aur
+#### aur
 ```
 yay -Sy ffmpeg yt-dlp
 ```
 
-## apt
+#### apt
 ```
 apt update && apt install ffmpeg yt-dlp -y
 ```
 
-### Windows
+#### Windows
 ```
 winget install Gyan.FFmpeg yt-dlp.yt-dlp --source winget
 ```
