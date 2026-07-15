@@ -79,9 +79,22 @@ func main() {
 	c.Stdout, c.Stderr = os.Stdout, os.Stderr
 	c.Run()
 
-	c = exec.Command("yt-dlp", "-x", "--audio-format", "mp3", "-o", filepath.Join(dir, "audio.mp3"), u)
+	c = exec.Command("yt-dlp", "-f", "bestaudio/best", "-o", filepath.Join(dir, "audio.%(ext)s"), u)
 	c.Stdout, c.Stderr = os.Stdout, os.Stderr
 	c.Run()
+
+	if f, _ := filepath.Glob(filepath.Join(dir, "audio.*")); len(f) > 0 {
+		for _, a := range f {
+			if filepath.Ext(a) == ".ogg" {
+				continue
+			}
+			c = exec.Command("ffmpeg", "-y", "-i", a, "-vn", "-c:a", "libvorbis", "-q:a", "6", filepath.Join(dir, "audio.ogg"))
+			c.Stdout, c.Stderr = os.Stdout, os.Stderr
+			c.Run()
+			os.Remove(a)
+			break
+		}
+	}
 
 	if vid {
 		vt := filepath.Join(dir, "temp")
@@ -105,7 +118,7 @@ func main() {
 	osu := fmt.Sprintf(`osu file format v128
 
 [General]
-AudioFilename: audio.mp3
+AudioFilename: audio.ogg
 AudioLeadIn: 0
 Countdown: 0
 SampleSet: Auto
