@@ -14,6 +14,62 @@ import (
 	"time"
 )
 
+func parseVideoPrompt(input string) bool {
+	s := strings.TrimSpace(strings.ToLower(input))
+	if s == "" {
+		return true
+	}
+	return !(strings.HasPrefix(s, "n") || strings.HasPrefix(s, "no"))
+}
+
+func buildOSUContent(title, artist string, includeVideo bool) string {
+	if title == "" {
+		title = "video"
+	}
+	if artist == "" {
+		artist = "Unknown Artist"
+	}
+
+	v := ""
+	if includeVideo {
+		v = "Video,0,\"video.mp4\"\n"
+	}
+
+	return fmt.Sprintf(`osu file format v128
+
+[General]
+AudioFilename: audio.ogg
+AudioLeadIn: 0
+Countdown: 0
+SampleSet: Auto
+StackLeniency: 0.7
+Mode: 0
+LetterboxInBreaks: 0
+WidescreenStoryboard: 1
+
+[Metadata]
+Title:%s
+TitleUnicode:%s
+Artist:%s
+ArtistUnicode:%s
+BeatmapID:0
+BeatmapSetID:-1
+
+[Difficulty]
+HPDrainRate:5
+CircleSize:5
+OverallDifficulty:5
+ApproachRate:8
+SliderMultiplier:1
+SliderTickRate:1
+
+[Events]
+0,0,"bg.png",0,0
+%s
+[TimingPoints]
+`, title, title, artist, artist, v)
+}
+
 func main() {
 	defer bufio.NewReader(os.Stdin).ReadBytes('\n')
 
@@ -51,7 +107,7 @@ func main() {
 
 	fmt.Print("Video? [Y/n]: ")
 	ans, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	vid := !strings.Contains(strings.ToLower(ans), "n")
+	vid := parseVideoPrompt(ans)
 
 	mOut, _ := exec.Command("yt-dlp", "--print-json", "--skip-download", u).Output()
 	var m struct {
@@ -110,45 +166,7 @@ func main() {
 		}
 	}
 
-	v := ""
-	if vid {
-		v = "Video,0,\"video.mp4\"\n"
-	}
-
-	osu := fmt.Sprintf(`osu file format v128
-
-[General]
-AudioFilename: audio.ogg
-AudioLeadIn: 0
-Countdown: 0
-SampleSet: Auto
-StackLeniency: 0.7
-Mode: 0
-LetterboxInBreaks: 0
-WidescreenStoryboard: 1
-
-[Metadata]
-Title:%s
-TitleUnicode:%s
-Artist:%s
-ArtistUnicode:%s
-BeatmapID:0
-BeatmapSetID:-1
-
-[Difficulty]
-HPDrainRate:5
-CircleSize:5
-OverallDifficulty:5
-ApproachRate:8
-SliderMultiplier:1
-SliderTickRate:1
-
-[Events]
-0,0,"bg.png",0,0
-%s
-[TimingPoints]
-`, t, t, m.Up, m.Up, v)
-
+	osu := buildOSUContent(t, m.Up, vid)
 	os.WriteFile(filepath.Join(dir, fmt.Sprintf("%s - %s.osu", m.Up, t)), []byte(osu), 0644)
 
 	osz := filepath.Join(root, t+".osz")
