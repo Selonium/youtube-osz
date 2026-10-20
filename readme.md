@@ -5,7 +5,7 @@ Outputs a complete .osz (osu custom map file) ready to start mapping
 
 ## Dependencies
 
-Ensure ffmpeg and yt-dlp are available in PATH
+Ensure `ffmpeg` is available in `PATH`. `yt-dlp` nightly is bundled directly into the binary (under The Unlicense), and `yt-osz` will automatically prefer a shared `yt-dlp` from `PATH` if available (falling back to the bundled nightly binary if missing or if the system `yt-dlp` fails).
 
 #### aur
 ```
